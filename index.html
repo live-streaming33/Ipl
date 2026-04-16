@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Sports - IPL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1a3f 0%, #1a2a5f 50%, #0d1f42 100%);
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(37, 99, 235, 0.15);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            color: #60a5fa;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #93c5fd;
+            font-size: 16px;
+        }
+
+        .player-section {
+            margin-bottom: 30px;
+        }
+
+        .player-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .player-title {
+            font-size: 14px;
+            color: #93c5fd;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            z-index: 50;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-red {
+            background: linear-gradient(135deg, #e8000d, #ff1a24);
+        }
+
+        .btn-red:hover {
+            background: linear-gradient(135deg, #ff1a24, #ff3344);
+            box-shadow: 0 5px 15px rgba(232, 0, 13, 0.3);
+        }
+
+        .quality-menu {
+            position: relative;
+        }
+
+        .quality-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(10, 25, 47, 0.98);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            border-radius: 8px;
+            min-width: 120px;
+            margin-top: 8px;
+            z-index: 300;
+        }
+
+        .quality-dropdown.show {
+            display: block;
+        }
+
+        .quality-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            font-size: 12px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .quality-item:last-child {
+            border-bottom: none;
+        }
+
+        .quality-item:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .quality-item.active {
+            background: rgba(96, 165, 250, 0.4);
+            color: #60a5fa;
+        }
+
+        .player-wrap {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #000;
+            border: 3px solid #3b82f6;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.4);
+            width: 100%;
+            aspect-ratio: 16/9;
+            min-height: 400px;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: #000;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .channels-section {
+            margin-bottom: 30px;
+        }
+
+        .channels-title {
+            font-size: 14px;
+            color: #93c5fd;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .channels-panel {
+            border-radius: 12px;
+            background: rgba(30, 58, 138, 0.4);
+            border: 2px solid rgba(59, 130, 246, 0.5);
+            overflow: hidden;
+        }
+
+        .channels-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+            transition: background 0.3s;
+        }
+
+        .channels-header:hover {
+            background: rgba(30, 58, 138, 0.6);
+        }
+
+        .ch-info {
+            flex: 1;
+        }
+
+        .ch-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .ch-desc {
+            font-size: 12px;
+            color: #93c5fd;
+            margin-top: 4px;
+        }
+
+        .ch-arrow {
+            font-size: 20px;
+            color: #60a5fa;
+            transition: transform 0.3s;
+        }
+
+        .ch-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .channels-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .channels-list.open {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .channel-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.2s;
+        }
+
+        .channel-item:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .channel-item.active {
+            background: rgba(59, 130, 246, 0.3);
+            border-left: 4px solid #60a5fa;
+            padding-left: 16px;
+        }
+
+        .ch-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .ch-text {
+            flex: 1;
+        }
+
+        .ch-text-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .ch-text-desc {
+            font-size: 11px;
+            color: #93c5fd;
+            margin-top: 2px;
+        }
+
+        .ch-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .willow-badge {
+            background: linear-gradient(135deg, #e8000d, #ff1a24) !important;
+            margin-left: 6px;
+        }
+
+        .info-box {
+            background: rgba(30, 58, 138, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-box h3 {
+            color: #60a5fa;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .info-box p {
+            color: #cbd5e1;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid rgba(59, 130, 246, 0.3);
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .player-wrap {
+                min-height: 280px;
+            }
+
+            .player-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #2563eb);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🏏 SPORTS LIVE</h1>
+        <p>Live Streaming - Ad Free</p>
+    </div>
+
+    <div class="player-section">
+        <div class="player-info">
+            <div class="player-title">📺 Now Playing</div>
+            <div class="player-controls">
+                <div class="quality-menu">
+                    <button class="btn" onclick="toggleQuality()">⚙️ Quality</button>
+                    <div class="quality-dropdown" id="qualityDropdown">
+                        <div class="quality-item active" onclick="setQuality('auto')">Auto</div>
+                        <div class="quality-item" onclick="setQuality('360p')">360p</div>
+                        <div class="quality-item" onclick="setQuality('480p')">480p</div>
+                        <div class="quality-item" onclick="setQuality('720p')">720p</div>
+                        <div class="quality-item" onclick="setQuality('1080p')">1080p</div>
+                    </div>
+                </div>
+                <button class="btn btn-red" id="reloadBtn" style="display:none;" onclick="reloadStream()">↺ Reload</button>
+            </div>
+        </div>
+
+        <div class="player-wrap">
+            <video id="player" controls controlsList="nodownload" playsinline></video>
+        </div>
+    </div>
+
+    <div class="channels-section">
+        <div class="channels-title">📡 Select Channel</div>
+        <div class="channels-panel">
+            <div class="channels-header" onclick="toggleChannels()">
+                <div class="ch-info">
+                    <div class="ch-name" id="currentChName">Loading...</div>
+                    <div class="ch-desc" id="currentChDesc"></div>
+                </div>
+                <div class="ch-arrow" id="channelArrow">▼</div>
+            </div>
+            <div class="channels-list" id="channelsList"></div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <h3>✨ Features</h3>
+        <p>🎬 Ad-Free Streaming | 🎚️ Quality Control | 🎵 Full Audio Controls | 📱 Mobile Friendly | ⛶ Fullscreen | 🔄 Reload Option</p>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Live Sports Streaming | All rights reserved</p>
+    </div>
+</div>
+
+<script>
+const streams = [
+    {
+        id: 1,
+        name: "Willow Sports",
+        desc: "Live Cricket Streaming",
+        url: "https://allinonereborn.online/mpd/willoc.html",
+        type: "willow",
+        tag: "cricket"
+    },
+    {
+        id: 2,
+        name: "Test HD Video 1",
+        desc: "Full HD Quality - 1080p",
+        url: "https://www.w3schools.com/html/mov_bbb.mp4",
+        type: "video",
+        tag: "hd"
+    },
+    {
+        id: 3,
+        name: "Test Video 2",
+        desc: "4K Ultra Quality",
+        url: "https://commondatastorage.googleapis.com/gtv-videos-library/sample/big_buck_bunny.mp4",
+        type: "video",
+        tag: "4k"
+    },
+    {
+        id: 4,
+        name: "Test Video 3",
+        desc: "HD Streaming",
+        url: "https://commondatastorage.googleapis.com/gtv-videos-library/sample/elephant_dream.mp4",
+        type: "video",
+        tag: "hd"
+    },
+    {
+        id: 5,
+        name: "Test Video 4",
+        desc: "Full HD Quality",
+        url: "https://commondatastorage.googleapis.com/gtv-videos-library/sample/fortnite.mp4",
+        type: "video",
+        tag: "live"
+    }
+];
+
+let currentStream = null;
+const playerWrap = document.querySelector('.player-wrap');
+
+function renderStreams() {
+    const list = document.getElementById('channelsList');
+    list.innerHTML = streams.map((s, i) => `
+        <div class="channel-item${i === 0 ? ' active' : ''}" onclick="playStream(${s.id})">
+            <div class="ch-num">${i + 1}</div>
+            <div class="ch-text">
+                <div class="ch-text-name">${s.name}${s.type === 'willow' ? '<span class="ch-badge willow-badge">WILLOW</span>' : ''}</div>
+                <div class="ch-text-desc">${s.desc}</div>
+            </div>
+            <div class="ch-badge">${s.tag.toUpperCase()}</div>
+        </div>
+    `).join('');
+
+    playStream(1);
+}
+
+function playStream(id) {
+    const stream = streams.find(s => s.id === id);
+    if (!stream) return;
+
+    currentStream = stream;
+
+    // Update UI
+    document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
+    document.querySelector(`[onclick="playStream(${id})"]`).classList.add('active');
+
+    document.getElementById('currentChName').textContent = stream.name;
+    document.getElementById('currentChDesc').textContent = stream.desc;
+    document.getElementById('reloadBtn').style.display = stream.type === 'willow' ? 'block' : 'none';
+
+    closeChannels();
+
+    // Load stream
+    if (stream.type === 'willow') {
+        loadWillow(stream.url);
+    } else {
+        loadVideo(stream.url);
+    }
+}
+
+function loadVideo(url) {
+    playerWrap.innerHTML = '<video id="player" controls controlsList="nodownload" playsinline style="width:100%; height:100%;"></video>';
+    const video = document.getElementById('player');
+    video.src = url;
+    video.play().catch(() => {});
+}
+
+function loadWillow(url) {
+    playerWrap.innerHTML = `
+        <iframe 
+            id="willowFrame"
+            src="${url}?t=${Date.now()}" 
+            allow="autoplay; fullscreen; encrypted-media" 
+            allowfullscreen
+            sandbox="allow-same-origin allow-scripts allow-presentation">
+        </iframe>
+    `;
+}
+
+function reloadStream() {
+    if (currentStream && currentStream.type === 'willow') {
+        loadWillow(currentStream.url);
+    }
+}
+
+function toggleQuality() {
+    document.getElementById('qualityDropdown').classList.toggle('show');
+}
+
+function setQuality(quality) {
+    document.querySelectorAll('.quality-item').forEach(el => el.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('qualityDropdown').classList.remove('show');
+}
+
+function toggleChannels() {
+    const list = document.getElementById('channelsList');
+    const arrow = document.getElementById('channelArrow');
+    list.classList.toggle('open');
+    arrow.classList.toggle('open');
+}
+
+function closeChannels() {
+    document.getElementById('channelsList').classList.remove('open');
+    document.getElementById('channelArrow').classList.remove('open');
+}
+
+// Close menus on outside click
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.quality-menu')) {
+        document.getElementById('qualityDropdown').classList.remove('show');
+    }
+    if (!e.target.closest('.channels-panel')) {
+        closeChannels();
+    }
+});
+
+// Block ads globally
+window.addEventListener('beforeunload', (e) => {
+    const ads = document.querySelectorAll('[data-ad], .advertisement, .ad');
+    ads.forEach(ad => ad.remove());
+});
+
+document.addEventListener('click', (e) => {
+    if (e.target.href && e.target.href.includes('ad')) {
+        e.preventDefault();
+        return false;
+    }
+}, true);
+
+window.addEventListener('load', renderStreams);
+</script>
+
+</body>
+  </html>
